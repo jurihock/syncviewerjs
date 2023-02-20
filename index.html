@@ -1,0 +1,113 @@
+<html>
+<head>
+
+<link href="https://unpkg.com/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://unpkg.com/viewerjs@1/dist/viewer.min.css" rel="stylesheet"/>
+<script src="https://unpkg.com/viewerjs@1/dist/viewer.min.js"></script>
+
+<style>
+
+.bg-frame {
+	background: #333
+}
+
+.bg-chess {
+	background: 
+		repeating-conic-gradient(#666 0% 25%, #CCC 0% 50%)
+			25% / 20px 20px
+}
+
+</style>
+
+</head>
+<body class="p-0 m-0 bg-frame">
+
+<div class="inline-grid grid-cols-2 gap-1 p-1 w-screen h-screen">
+	<div class="bg-chess">
+		<img id="image0" data="https://github.com/fengyuanchen/viewerjs/raw/main/docs/images/tibet-1.jpg">
+	</div>
+	<div class="bg-chess">
+		<img id="image1" data="https://github.com/fengyuanchen/viewerjs/raw/main/docs/images/tibet-2.jpg">
+	</div>
+	<div class="bg-chess">
+		<img id="image2" data="https://github.com/fengyuanchen/viewerjs/raw/main/docs/images/tibet-3.jpg">
+	</div>
+	<div class="bg-chess">
+		<img id="image3" data="https://github.com/fengyuanchen/viewerjs/raw/main/docs/images/tibet-4.jpg">
+	</div>
+</div>
+
+<script type="text/javascript">
+
+const n = 4;
+
+const images = [];
+const viewers = [];
+
+let viewer = null;
+
+for (let i = 0; i < n; i++)
+{
+	images[i] = document.getElementById('image' + i);
+	viewers[i] = new Viewer(images[i], {
+		url: 'data',
+		inline: true,
+		backdrop: false,
+		button: false,
+		navbar: false,
+		toolbar: false,
+		title: false,
+		fullscreen: false,
+		slideOnTouch: false,
+		toggleOnDblclick: true,
+		viewed() {
+			this.viewer.zoomTo(1);
+			this.viewer.moveTo(0, 0);
+		},
+		move(event) {
+			if (viewer !== null) {
+				return;
+			}
+			viewer = this.viewer;
+		},
+		moved(event) {
+			if (viewer !== this.viewer) {
+				return;
+			}
+			const x = this.viewer.imageData.x;
+			const y = this.viewer.imageData.y;
+			for (let j = 0; j < n; j++) {
+				if (viewers[j] !== this.viewer) {
+					viewers[j].moveTo(x, y);
+				}
+			}
+			viewer = null;
+		},
+		zoom(event) {
+			if (viewer !== null) {
+				return;
+			}
+			viewer = this.viewer;
+		},
+		zoomed(event) {
+			if (viewer !== this.viewer) {
+				return;
+			}
+			const r = this.viewer.imageData.ratio;
+			const x = this.viewer.imageData.x;
+			const y = this.viewer.imageData.y;
+			for (let j = 0; j < n; j++) {
+				if (viewers[j] !== this.viewer) {
+					viewers[j].zoomTo(r);
+					viewers[j].moveTo(x, y);
+				}
+			}
+			viewer = null;
+		},
+	});
+}
+
+</script>
+
+</body>
+</html>
